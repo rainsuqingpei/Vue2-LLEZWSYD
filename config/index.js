@@ -34,8 +34,8 @@ module.exports = {
     proxyTable: {
       '/zwzzj': {  //代理地址
         // target: 'http://60.18.233.232:8037/zwzzj',  //代理铁岭正式
-        target: 'http://221.180.205.79:8034/zwzzj',  //代理辽宁正式
-        // target: 'http://218.60.154.3:8034/zwzzj',  //代理辽宁测试
+        // target: 'http://221.180.205.79:8034/zwzzj',  //代理辽宁正式
+        target: 'http://218.60.154.3:8034/zwzzj',  //代理辽宁测试
         changeOrigin: true,  //是否跨域
         secure: false,
         pathRewrite: {
