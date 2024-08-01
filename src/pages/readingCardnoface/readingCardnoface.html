@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <!-- <link rel="stylesheet" href="./static/css/reset.css" /> -->
+    <!-- <link rel="stylesheet" href="./static/css/common.css" /> -->
+    <link rel="icon" href="data:image/ico;base64,aWNv" />
+    <title>读卡认证</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="readingCardnoface"></div>
+    <!-- <object classid="clsid:81D20949-0B70-4B49-AE83-B012930459B0" id="readCardOcx"
+    codebase="../config/TermbTrustyActiveX.cab#version=1,0,0,1" viewastext width="0" height="0">
+  </object> -->
+</body>
+<script>
+    //-- 获取图片
+    function checkHtjc(ULONG) {
+        let that = this;
+        var imageTable = document.getElementById("imageTable");
+        var imageTbody = document.getElementById("imageTbody");
+        imageTable.removeChild(imageTbody);
+        imageTbody = document.createElement("tbody");
+        imageTbody.setAttribute("id", "imageTbody");
+        if (ULONG < 0 || ULONG == 0) {
+            //alert("检测未通过,请重试");<0
+            //alert("未获得质量合格的图片");==0
+            imageTable.appendChild(imageTbody);
+            if ("-1" == ULONG) {
+                window.setTimeout(function() {
+                    startCheck()
+                }, 1000);
+            }
+            if ("-2" == ULONG) {
+                window.setTimeout(function() {
+                    startVedio();
+                    startCheck();
+                }, 1000);
+            }
+            return;
+        }
+        // console.log('已经开始获取图片')
+        var ua = navigator.userAgent;
+        var s = "MSIE";
+        var i = ua.indexOf(s)
+        var ieValue = parseFloat(ua.substr(i + s.length));
+
+        for (var t = 0; t < 1; t++) {
+            //获取控件对象
+            var htjcObj = document.getElementById("CommonLiveDetectionOCX");
+            var row = document.createElement("tr");
+            var row2 = document.createElement("tr");
+            var srcHeader = "data:image/gif;base64,";
+            var imageNormal = document.createElement("img");
+            //创建正常照片td
+            var srcNormal = htjcObj.GetQualifiedImageByIndex(t);
+
+            var divNormal = document.createElement("div");
+            // divNormal.innerHTML = srcNormal;
+            divNormal.setAttribute("ondblclick", "copyInner(this.innerHTML)");
+            divNormal.setAttribute("style", "border-bottom: 1px; border-left: 1px; border-top: 1px; border-right: 1px;");
+
+            var tdNormal = document.createElement("td");
+            // tdNormal.innerHTML = "正常图像" + (t + 1) + ":";
+            tdNormal.appendChild(divNormal);
+            row.appendChild(tdNormal);
+
+            //创建缩略图
+            var srcShrink = htjcObj.GetShrinkQualifiedImageByIndex(t);
+            var divShrink = document.createElement("div");
+            // divShrink.innerHTML = srcShrink;
+            divShrink.setAttribute("ondblclick", "copyInner(this.innerHTML)");
+            divShrink.setAttribute("style", "border-bottom: 1px; border-left: 1px; border-top: 1px; border-right: 1px;");
+
+            var tdShrink = document.createElement("td");
+            // tdShrink.innerHTML = "缩略图像" + (t + 1) + ":";
+            tdShrink.appendChild(divShrink);
+            row2.appendChild(tdShrink);
+            //将row放到tbody中
+            imageTbody.appendChild(row);
+            imageTbody.appendChild(row2);
+
+            var base64Data = new Array();
+            base64Data[0] = srcNormal;
+
+            // document.getElementById("base64Data").value = base64Data;
+            // window.sessionStorage.removeItem('srcNormal')
+            var newStorageEvent = document.createEvent('StorageEvent');
+            const storage = {
+                setItem: function(k, val) {
+                    sessionStorage.setItem(k, val);
+
+                    // 初始化创建的事件
+                    newStorageEvent.initStorageEvent('setItem', false, false, k, null, val, null, null);
+
+                    // 派发对象
+                    window.dispatchEvent(newStorageEvent)
+                }
+            }
+            return storage.setItem("srcNormal", srcNormal);
+        }
+        stopVedio();
+        stopLiveDetect();
+        imageTable.appendChild(imageTbody);
+    };
+
+    function readImg() {
+        let that = this;
+        let htjcObj = document.getElementById("CommonLiveDetectionOCX");
+        htjcObj.width = "640px";
+        htjcObj.height = "460px";
+        setTimeout(function() {
+            // 开启摄像头
+            startVedio()
+        }, 1000);
+        // 开启数据采集
+        // startCheck();
+    };
+
+    // -- 开启摄像头/
+    function startVedio() {
+        let htjcObj = document.getElementById("CommonLiveDetectionOCX");
+        htjcObj.StartVedio();
+        console.log('开启摄像头');
+        // 开启数据采集
+        startCheck();
+    };
+
+    // -- 开启活体检测/
+    function startCheck() {
+        console.log('开启活体检测');
+        var htjcObj = document.getElementById("CommonLiveDetectionOCX");
+        htjcObj.StartLiveDetection();
+    };
+
+    // -- 关闭摄像头/
+    function stopVedio() {
+        console.log('关闭摄像头')
+        let htjcObj = document.getElementById("CommonLiveDetectionOCX");
+        htjcObj.StopVedio();
+    };
+
+    //停止活体检测
+    function stopLiveDetect() {
+        console.log('停止活体检测');
+        var htjcObj = document.getElementById("CommonLiveDetectionOCX");
+        htjcObj.StopLiveDetection();
+    }
+</script>
+<script type="text/javascript" for="CommonLiveDetectionOCX" event="LiveDetectStatusEvent(ULONG)">
+    checkHtjc(ULONG)
+</script>
+
+</html>
